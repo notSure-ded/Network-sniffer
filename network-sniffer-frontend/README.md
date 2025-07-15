@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+🔐 Network Packet Sniffer & Threat Detector
+A full-stack network monitoring system that captures live packets, analyzes them using a trained ML model, flags suspicious traffic, and displays threat logs in a sleek React dashboard. Built using Python, Scapy, Flask, SQLite, and React.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+🚀 Features
+📡 Live Packet Sniffing with Scapy
 
-## Available Scripts
+🧠 ML-based Traffic Classification (benign vs suspicious)
 
-In the project directory, you can run:
+🌐 GeoIP Lookup of attacker IPs (country + city)
 
-### `npm start`
+🛡️ VirusTotal API Integration for malicious IP detection
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+💾 PCAP Export for offline Wireshark analysis
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+🧱 SQLite Logging of detected threats
 
-### `npm test`
+🌍 React Frontend with auto-refresh & real-time threat log table
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+⚙️ Flask REST API to manage sniffer, logs, and exports
 
-### `npm run build`
+📂 Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+├── backend/
+│   ├── predictor.py          # Packet sniffer + ML prediction logic
+│   ├── app.py                # Flask API
+│   ├── threat_log.db         # SQLite DB storing threats
+│   ├── model/                # Trained model + encoders
+│   ├── MMDB/                 # GeoLite2 IP database
+├── frontend/
+│   ├── src/App.js            # React app
+│   ├── src/App.css           # UI styling
+├── output/                   # Auto-exported PCAP files
+├── packet_dataset.csv        # Training data
+├── README.md
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+🛠️ Tech Stack
+Backend: Python, Scapy, Scikit-learn, Flask, SQLite, GeoIP2
+Frontend: React.js, JavaScript, HTML, CSS
+APIs: VirusTotal, GeoLite2 (MaxMind)
 
-### `npm run eject`
+🔧 Setup Instructions
+1. Clone the Repo
+git clone https://github.com/yourusername/network-sniffer.git
+cd network-sniffer
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Backend Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+cd backend
+pip install -r requirements.txt
+python app.py
+Make sure to place your GeoLite2-City.mmdb file in the MMDB/ folder.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Frontend Setup
+cd frontend
+npm install
+npm start
+App runs at: http://localhost:3000
+Backend API runs at: http://localhost:5000
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+📊 Sample Log Entry
+ID	Source IP	Destination IP	Reason	Country	City
+47	104.18.32.47	192.168.0.106	ML: Suspicious pattern	United States	Des Moines
 
-## Learn More
+✅ To Do / Improvements
+Add real-time charts (threat count over time)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+IP filtering or search bar
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Blacklist/whitelist manager
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Telegram/Discord alert integration
