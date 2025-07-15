@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, send_file
 import threading
-import time
+import sqlite3
 import os
 from predictor import start_sniffing, get_threat_logs
 
@@ -23,9 +23,20 @@ def start_sniffer():
     return jsonify({"status": "already running"})
 
 @app.route("/logs")
-def get_logs():
-    logs = get_threat_logs()
-    return jsonify(logs)
+def logs():
+    conn = sqlite3.connect("threat_log.db")
+    c = conn.cursor()
+    c.execute("""
+        SELECT * FROM (
+            SELECT * FROM threats ORDER BY id DESC LIMIT 50
+        ) sub
+        ORDER BY id ASC
+    """)
+    rows = c.fetchall()
+    conn.close()
+    return jsonify(rows)
+
+
 
 @app.route("/download-pcap")
 def download_pcap():

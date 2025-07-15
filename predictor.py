@@ -10,20 +10,20 @@ from scapy.utils import wrpcap
 import pandas as pd
 import threading
 
-# Load model
+
 model = joblib.load("model/threat_model.pkl")
 
-# GeoIP
+
 geoip_reader = geoip2.database.Reader("MMDB/GeoLite2-City.mmdb")
 
-# VirusTotal
+
 VT_API_KEY = "6c8b82c5b34b023eb3eac2d9fb5164b4aefce5ed9f0be8b25a95a405e22944c4"
 VT_HEADERS = {"x-apikey": VT_API_KEY}
 
-# PCAP storage
+
 suspicious_packets = []
 
-# DB Setup
+
 def init_db():
     conn = sqlite3.connect("threat_log.db")
     c = conn.cursor()
@@ -113,45 +113,45 @@ def process_packet(packet):
         try:
             features = extract_features(packet)
 
-            # Use proper feature names to match training
             feature_names = [
-    "length", "has_raw", "has_dns", "has_tcp", "has_udp",
-    "has_icmp", "src_port", "dst_port", "flags"
-]
-
+                "length", "has_raw", "has_dns", "has_tcp", "has_udp",
+                "has_icmp", "src_port", "dst_port", "flags"
+            ]
             df_features = pd.DataFrame([features], columns=feature_names)
 
             prediction = model.predict(df_features)[0]
             prob = model.predict_proba(df_features)[0][prediction]
             label = "suspicious" if prediction == 1 else "normal"
-            if prediction == 1:
+
+            already_logged = False
+
+           
+            if prediction >= 0.9:
                 country, city = get_geoip_info(src_ip)
                 log_threat(src_ip, dst_ip, "ML: Suspicious pattern", country, city)
                 suspicious_packets.append(packet)
                 print(f"[ML] Suspicious: {src_ip} -> {dst_ip} ({country}, {city})")
+                already_logged = True
 
-            if check_virustotal(src_ip):
+            
+            if check_virustotal(src_ip) and not already_logged:
                 country, city = get_geoip_info(src_ip)
                 log_threat(src_ip, dst_ip, "VirusTotal: Malicious IP", country, city)
                 suspicious_packets.append(packet)
                 print(f"[VT] Malicious IP: {src_ip} -> {dst_ip} ({country}, {city})")
+                already_logged = True
 
-            elif prediction >= 0.8:
-                print(f"[ML] {src_ip} -> {dst_ip} | Predicted: {label} | Confidence: {prob}")
-
+            
+            if prob >= 0.8:
+                print(f"[ML] {src_ip} -> {dst_ip} | Predicted: {label} | Confidence: {prob:.2f} Predection : {prediction: .2f}" )
 
         except Exception as e:
             print(f"[!] Error: {e}")
 
+
 import signal
 running = True  
 
-def signal_handler(sig, frame):
-    global running
-    print("\n[!] Ctrl+C detected. Stopping sniffing...")
-    running = False
-
-signal.signal(signal.SIGINT, signal_handler)
 
 def signal_handler(sig, frame):
     global running
