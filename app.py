@@ -4,7 +4,10 @@ import time
 import os
 from predictor import start_sniffing, get_threat_logs
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 
 sniffer_thread = None
 sniffer_running = False
